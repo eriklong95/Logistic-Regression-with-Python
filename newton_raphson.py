@@ -1,11 +1,10 @@
 import math
 import numpy as np
-''' 
-f: R^k -> R^k is the function for which we want
-to find a root, df is its total derivative.
-x0 or (x0, y0) is our initial guess for the root,
-n is the number of iterations.
-'''
+
+# f: R^k -> R^k is the function for which we want
+# to find a root, df is its total derivative.
+# x0 or (x0, y0) is our initial guess for the root,
+# n is the number of iterations.
 
 
 def method_onedim(f, df, x0, n):

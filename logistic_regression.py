@@ -6,18 +6,15 @@ import matplotlib.pyplot as plt
 
 class LogisticRegression:
 
-    iterations_newton_raphson = 5 # number of iterations in applications of the Newton-Raphson metod
+    iterations_newton_raphson = 5  # Number of iterations in applications of the Newton-Raphson method
 
     def __init__(self, predictors, responses, group_sizes):
-        self.predictors = predictors  # 1d-array holding predictors (log-concentrations)
-        self.responses = responses  # 1d-array, i'th entry holds number of successes for i'th predictor
-        self.group_sizes = group_sizes  # 1d-array with number of observations for each predictor
+        self.predictors = predictors  # Array holding predictors.
+        self.responses = responses  # Array, i'th entry holds number of successes for i'th predictor.
+        self.group_sizes = group_sizes  # Array, i'th entry holds number of observations for i'th predictor.
 
-    # features of the data (noegletal)
-    def get_num_of_obs(self):
-        pass
-
-    def get_frequencies(self):
+    # Sample statistics
+    def get_frequencies(self):  # Returns array holding the success frequencies for each predictor.
         freqs = []
         for i in range(len(self.predictors)):
             freqs.append(self.responses[i] / self.group_sizes[i])
