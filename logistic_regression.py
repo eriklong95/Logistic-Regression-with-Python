@@ -3,6 +3,24 @@ import numpy as np
 import newton_raphson
 import matplotlib.pyplot as plt
 
+# We are given a number of observations with values 0 or 1, each of which is associated with some predictor.
+# We assume that the probability p of some observation being 1 is given by logit(p) = alpha + beta * t for
+# unknown alpha and beta where t is the associated predictor and logit(p) = log(p / (1 - p)). Finding alpha and
+# beta given data is called LOGISTIC REGRESSION.
+
+# For example, imagine that a number of flies is exposed to a substance containing some toxic, where the
+# concentration of the toxic in the substance is varying. We could then try to model the probability of a fly
+# dying given that it has been a certain concentration of the toxic using the logistic regression model. (Usually,
+# ine uses the log of concentration as the predictor in this case.)
+
+# An instance of the LogisticRegression class represents some data suitable for logistic regression and has
+# methods for performing logistic regression and visualising the results. The parameters are estimated using
+# maximum likehood estimation. The maximisation is performed using the Newton-Raphson method.
+
+# Reference: Ernst Hansen: Introduktion til Matematisk Statistik, Københavns Universitet
+
+# Erik Lange, 10-06-2021
+
 
 class LogisticRegression:
 
@@ -11,7 +29,7 @@ class LogisticRegression:
     def __init__(self, predictors, responses, group_sizes):
         self.predictors = predictors  # Array holding predictors.
         self.responses = responses  # Array, i'th entry holds number of successes for i'th predictor.
-        self.group_sizes = group_sizes  # Array, i'th entry holds number of observations for i'th predictor.
+        self.group_sizes = group_sizes  # Array, i'th entry holds number of observations associated with i'th predictor.
 
     # Sample statistics
     def get_frequencies(self):  # Returns array holding the success frequencies for each predictor.
@@ -50,8 +68,11 @@ class LogisticRegression:
         return np.array([[sum(gs[i] * terms[i] for i in range(len(t))),  sum(gs[i] * t[i] * terms[i] for i in range(len(t)))],
                         [sum(gs[i] * t[i] * terms[i] for i in range(len(t))), sum(gs[i] * t[i] ** 2 * terms[i] for i in range(len(t)))]])
 
-    # finding initials guesses for Newton-Raphson
+    # Finding initials guesses for Newton-Raphson
     def get_initials(self):
+        # This function makes an educated guess at the predictors t1 and t2 corresponding
+        # to the probabilities p1 and p2 based on the given data. It then returns an
+        # initial guess at alpha and beta, which it finds by solving a system of linear equations.
         p1, p2 = 0.25, 0.75
         i = 0
         while LogisticRegression.logit(self.get_frequencies()[i]) < LogisticRegression.logit(p1):
@@ -72,7 +93,7 @@ class LogisticRegression:
     def get_initial_beta(self):
         return self.get_initials()[1]
 
-    # Calculating estimates for alpha, beta and gamma = LD50
+    # Calculating estimates for alpha, beta and gamma = LD50 (= predictor corresponding to p = 0.50)
     def get_estimates(self):
         # run newton raphson on score-function
         return newton_raphson.method_twodim(self.score, self.information, self.get_initial_alpha(), self.get_initial_beta(), LogisticRegression.iterations_newton_raphson)
@@ -86,10 +107,7 @@ class LogisticRegression:
     def get_gamma_hat(self):
         return -self.get_alpha_hat() / self.get_beta_hat()
 
-    def get_estimated_variance_matrix(self):
-        return np.linalg.inv(self.information(self.get_alpha_hat(), self.get_beta_hat()))
-
-    # visualisation
+    # Visualisation
     def regression_curve(self, t):
         return exp(self.get_alpha_hat() + self.get_beta_hat() * t) / (1 + exp(self.get_alpha_hat() + self.get_beta_hat() * t))
 
@@ -103,7 +121,6 @@ class LogisticRegression:
         ax.plot(t, curve)
         ax.scatter(self.predictors, self.get_frequencies())
         plt.show()
-        # want data in plot also
 
     @classmethod
     def set_iterations_newton_raphson(cls, n):

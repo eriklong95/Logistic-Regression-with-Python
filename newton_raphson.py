@@ -1,4 +1,3 @@
-import math
 import numpy as np
 
 # f: R^k -> R^k is the function for which we want
